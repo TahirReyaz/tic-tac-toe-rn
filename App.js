@@ -14,12 +14,14 @@ import Colors from "./constants/Colors";
 import Circle from "./components/Circle";
 import Cross from "./components/Cross";
 
+const initialMap = [
+  ["", "", ""],
+  ["", "", ""],
+  ["", "", ""],
+];
+
 export default function App() {
-  const [gameMap, setGameMap] = useState([
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-  ]);
+  const [gameMap, setGameMap] = useState(initialMap);
   const [currentTurn, setCurrentTurn] = useState("x");
 
   const cellPressHandler = (rowIndex, colIndex) => {
@@ -35,6 +37,7 @@ export default function App() {
     });
 
     checkWinningState();
+    checkTie();
 
     setCurrentTurn((prevTurn) => (prevTurn === "x" ? "o" : "x"));
   };
@@ -46,9 +49,9 @@ export default function App() {
       const didOWonRow = gameMap[i].every((cell) => cell === "o");
 
       if (didOWonRow) {
-        Alert.alert("O won");
+        gameOver("o");
       } else if (didXWonRow) {
-        Alert.alert("X won");
+        gameOver("x");
       }
     }
 
@@ -63,9 +66,9 @@ export default function App() {
       }
 
       if (didOWonCol) {
-        Alert.alert("O won");
+        gameOver("o");
       } else if (didXWonCol) {
-        Alert.alert("X won");
+        gameOver("x");
       }
     }
 
@@ -94,10 +97,39 @@ export default function App() {
     }
     // declare diagonal winner
     if (didOWonRightDiagonal || didOWonLeftDiagonal) {
-      Alert.alert("O won");
+      gameOver("o");
     } else if (didXWonRightDiagonal || didXWonLeftDiagonal) {
-      Alert.alert("X won");
+      gameOver("x");
     }
+  };
+
+  const checkTie = () => {
+    let tie = true;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (gameMap[i][j] === "") tie = false;
+      }
+    }
+    if (tie) {
+      Alert.alert("Meh", "It was a Tie", [
+        { text: "Restart", onPress: resetGame },
+      ]);
+    }
+  };
+
+  const gameOver = (player) => {
+    Alert.alert("Hooray!!", `${player} won`, [
+      { text: "Restart", onPress: resetGame },
+    ]);
+  };
+
+  const resetGame = () => {
+    setGameMap([
+      ["", "", ""],
+      ["", "", ""],
+      ["", "", ""],
+    ]);
+    setCurrentTurn("x");
   };
 
   return (
