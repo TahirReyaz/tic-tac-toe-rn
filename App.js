@@ -16,16 +16,25 @@ import Cross from "./components/Cross";
 
 export default function App() {
   const [gameMap, setGameMap] = useState([
-    ["o", "", ""],
-    ["", "x", "x"],
-    ["o", "", ""],
+    ["", "", ""],
+    ["", "", ""],
+    ["", "", ""],
   ]);
+  const [currentTurn, setCurrentTurn] = useState("x");
 
   const cellPressHandler = (rowIndex, colIndex) => {
     if (gameMap[rowIndex][colIndex] !== "") {
       Alert.alert("Position already occupied");
       return;
     }
+
+    setGameMap((existingMap) => {
+      const updatedMap = [...existingMap];
+      updatedMap[rowIndex][colIndex] = currentTurn;
+      return updatedMap;
+    });
+
+    setCurrentTurn((prevTurn) => (prevTurn === "x" ? "o" : "x"));
   };
 
   return (
