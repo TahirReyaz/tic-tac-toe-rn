@@ -34,7 +34,70 @@ export default function App() {
       return updatedMap;
     });
 
+    checkWinningState();
+
     setCurrentTurn((prevTurn) => (prevTurn === "x" ? "o" : "x"));
+  };
+
+  const checkWinningState = () => {
+    // Check rows
+    for (let i = 0; i < 3; i++) {
+      const didXWonRow = gameMap[i].every((cell) => cell === "x");
+      const didOWonRow = gameMap[i].every((cell) => cell === "o");
+
+      if (didOWonRow) {
+        Alert.alert("O won");
+      } else if (didXWonRow) {
+        Alert.alert("X won");
+      }
+    }
+
+    // Check columns
+    for (let i = 0; i < 3; i++) {
+      let didXWonCol = true;
+      let didOWonCol = true;
+
+      for (let j = 0; j < 3; j++) {
+        if (gameMap[j][i] !== "x") didXWonCol = false;
+        if (gameMap[j][i] !== "o") didOWonCol = false;
+      }
+
+      if (didOWonCol) {
+        Alert.alert("O won");
+      } else if (didXWonCol) {
+        Alert.alert("X won");
+      }
+    }
+
+    // Check diagonals
+    let didXWonLeftDiagonal = true;
+    let didOWonLeftDiagonal = true;
+    let didXWonRightDiagonal = true;
+    let didOWonRightDiagonal = true;
+
+    for (let i = 0; i < 3; i++) {
+      // Left Diagonal
+      if (gameMap[i][i] !== "x") {
+        didXWonLeftDiagonal = false;
+      }
+      if (gameMap[i][i] !== "o") {
+        didOWonLeftDiagonal = false;
+      }
+
+      // Right Diagonal
+      if (gameMap[i][2 - i] !== "x") {
+        didXWonRightDiagonal = false;
+      }
+      if (gameMap[i][2 - i] !== "o") {
+        didOWonRightDiagonal = false;
+      }
+    }
+    // declare diagonal winner
+    if (didOWonRightDiagonal || didOWonLeftDiagonal) {
+      Alert.alert("O won");
+    } else if (didXWonRightDiagonal || didXWonLeftDiagonal) {
+      Alert.alert("X won");
+    }
   };
 
   return (
@@ -42,10 +105,10 @@ export default function App() {
       <ImageBackground source={bg} style={styles.bg} resizeMode="contain">
         <View style={styles.map}>
           {gameMap.map((row, rowIndex) => (
-            <View style={styles.row} key={rowIndex}>
+            <View style={styles.row} key={`row-${rowIndex}`}>
               {row.map((cell, colIndex) => (
                 <Pressable
-                  key={colIndex}
+                  key={`row-${rowIndex}-col-${colIndex}`}
                   style={styles.cell}
                   onPress={() => cellPressHandler(rowIndex, colIndex)}
                 >
