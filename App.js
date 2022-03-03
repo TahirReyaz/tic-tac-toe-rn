@@ -181,11 +181,8 @@ export default function App() {
   };
 
   const resetGame = () => {
-    setGameMap([
-      ["", "", ""],
-      ["", "", ""],
-      ["", "", ""],
-    ]);
+    const updatedMap = copyArray(initialMap);
+    setGameMap(updatedMap);
     setCurrentTurn("x");
   };
 
