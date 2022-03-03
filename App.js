@@ -11,8 +11,7 @@ import {
 
 import bg from "./assets/bg.jpeg";
 import Colors from "./constants/Colors";
-import Circle from "./components/Circle";
-import Cross from "./components/Cross";
+import Cell from "./src/components/Cell";
 
 const initialMap = [
   ["", "", ""],
@@ -138,18 +137,18 @@ export default function App() {
   return (
     <View style={styles.container}>
       <ImageBackground source={bg} style={styles.bg} resizeMode="contain">
+        <Text style={styles.topText}>
+          Current Turn: {currentTurn.toUpperCase()}
+        </Text>
         <View style={styles.map}>
           {gameMap.map((row, rowIndex) => (
             <View style={styles.row} key={`row-${rowIndex}`}>
               {row.map((cell, colIndex) => (
-                <Pressable
-                  key={`row-${rowIndex}-col-${colIndex}`}
-                  style={styles.cell}
+                <Cell
+                  key={`row-${props.rowIndex}-col-${props.colIndex}`}
+                  cell={cell}
                   onPress={() => cellPressHandler(rowIndex, colIndex)}
-                >
-                  {cell === "o" && <Circle />}
-                  {cell === "x" && <Cross />}
-                </Pressable>
+                />
               ))}
             </View>
           ))}
@@ -175,6 +174,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 20,
   },
+  topText: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
+    position: "absolute",
+    top: 50,
+  },
   map: {
     width: "80%",
     aspectRatio: 1,
@@ -184,12 +190,5 @@ const styles = StyleSheet.create({
   row: {
     flex: 1,
     flexDirection: "row",
-  },
-  cell: {
-    width: 100,
-    height: 100,
-    flex: 1,
-    // borderColor: "red",
-    // borderWidth: 2,
   },
 });
