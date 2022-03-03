@@ -1,13 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ImageBackground,
-  Pressable,
-  Alert,
-} from "react-native";
+import { StyleSheet, Text, View, ImageBackground, Alert } from "react-native";
 
 import bg from "./assets/bg.jpeg";
 import Colors from "./constants/Colors";
@@ -22,6 +15,12 @@ const initialMap = [
 export default function App() {
   const [gameMap, setGameMap] = useState(initialMap);
   const [currentTurn, setCurrentTurn] = useState("x");
+
+  useEffect(() => {
+    if (currentTurn === "o") {
+      botTurn();
+    }
+  }, [currentTurn, botTurn]);
 
   const cellPressHandler = (rowIndex, colIndex) => {
     if (gameMap[rowIndex][colIndex] !== "") {
@@ -42,6 +41,23 @@ export default function App() {
     } else {
       checkTie();
     }
+  };
+
+  const botTurn = () => {
+    // Get all available positions
+    const availableCells = [];
+    gameMap.forEach((row, rowIndex) => {
+      row.forEach((cell, colIndex) => {
+        if (cell === "") {
+          availableCells.push({ row: rowIndex, col: colIndex });
+        }
+      });
+    });
+
+    // Select a random position
+    const selectedCell =
+      availableCells[Math.floor(Math.random() * availableCells.length)];
+    if (selectedCell) cellPressHandler(selectedCell.row, selectedCell.col);
   };
 
   const getWinner = () => {
@@ -145,7 +161,7 @@ export default function App() {
             <View style={styles.row} key={`row-${rowIndex}`}>
               {row.map((cell, colIndex) => (
                 <Cell
-                  key={`row-${props.rowIndex}-col-${props.colIndex}`}
+                  key={`row-${rowIndex}-col-${colIndex}`}
                   cell={cell}
                   onPress={() => cellPressHandler(rowIndex, colIndex)}
                 />
