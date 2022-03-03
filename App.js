@@ -35,23 +35,26 @@ export default function App() {
       updatedMap[rowIndex][colIndex] = currentTurn;
       return updatedMap;
     });
-
-    checkWinningState();
-    checkTie();
-
     setCurrentTurn((prevTurn) => (prevTurn === "x" ? "o" : "x"));
+
+    const winner = getWinner();
+    if (winner) {
+      gameOver(winner);
+    } else {
+      checkTie();
+    }
   };
 
-  const checkWinningState = () => {
+  const getWinner = () => {
     // Check rows
     for (let i = 0; i < 3; i++) {
       const didXWonRow = gameMap[i].every((cell) => cell === "x");
       const didOWonRow = gameMap[i].every((cell) => cell === "o");
 
       if (didOWonRow) {
-        gameOver("o");
+        return "o";
       } else if (didXWonRow) {
-        gameOver("x");
+        return "x";
       }
     }
 
@@ -66,9 +69,9 @@ export default function App() {
       }
 
       if (didOWonCol) {
-        gameOver("o");
+        return "o";
       } else if (didXWonCol) {
-        gameOver("x");
+        return "x";
       }
     }
 
@@ -97,9 +100,9 @@ export default function App() {
     }
     // declare diagonal winner
     if (didOWonRightDiagonal || didOWonLeftDiagonal) {
-      gameOver("o");
+      return "o";
     } else if (didXWonRightDiagonal || didXWonLeftDiagonal) {
-      gameOver("x");
+      return "x";
     }
   };
 
