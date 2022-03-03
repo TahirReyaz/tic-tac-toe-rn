@@ -23,10 +23,10 @@ export default function App() {
   const [gameMode, setGameMode] = useState("BOT_MEDIUM");
 
   useEffect(() => {
-    if (currentTurn === "o") {
+    if (currentTurn === "o" && gameMode !== "LOCAL") {
       botTurn();
     }
-  }, [currentTurn, botTurn]);
+  }, [currentTurn, botTurn, gameMode]);
 
   useEffect(() => {
     const winner = getWinner(gameMap);
@@ -63,34 +63,35 @@ export default function App() {
       });
     });
 
-    // Attac
-    // Check possible cells for player to win
-    availableCells.forEach((availableCell) => {
-      const mapCopy = copyArray(gameMap);
-      mapCopy[availableCell.row][availableCell.col] = "o";
-
-      const winner = getWinner(mapCopy);
-      if (winner === "o") {
-        // Attac that cell
-        selectedCell = availableCell;
-      }
-    });
-
-    // Defend if no cell is available for attac
-    if (!selectedCell) {
+    if (gameMode === "BOT_MEDIUM") {
+      // Attac
       // Check possible cells for player to win
       availableCells.forEach((availableCell) => {
         const mapCopy = copyArray(gameMap);
-        mapCopy[availableCell.row][availableCell.col] = "x";
+        mapCopy[availableCell.row][availableCell.col] = "o";
 
         const winner = getWinner(mapCopy);
-        if (winner === "x") {
-          // Defend that cell
+        if (winner === "o") {
+          // Attac that cell
           selectedCell = availableCell;
         }
       });
-    }
 
+      // Defend if no cell is available for attac
+      if (!selectedCell) {
+        // Check possible cells for player to win
+        availableCells.forEach((availableCell) => {
+          const mapCopy = copyArray(gameMap);
+          mapCopy[availableCell.row][availableCell.col] = "x";
+
+          const winner = getWinner(mapCopy);
+          if (winner === "x") {
+            // Defend that cell
+            selectedCell = availableCell;
+          }
+        });
+      }
+    }
     // Select a random position
     if (!selectedCell) {
       selectedCell =
@@ -175,9 +176,22 @@ export default function App() {
   };
 
   const gameOver = (player) => {
-    Alert.alert("Hooray!!", `${player} won`, [
-      { text: "Restart", onPress: resetGame },
-    ]);
+    let title = "Hooray!!",
+      msg = `Player ${player.toUpperCase()} won`;
+    if (gameMode !== "LOCAL") {
+      if (player === "x") {
+        title += " You won";
+        msg = `Defeated the ${
+          gameMode === "BOT_EASY" ? "Easy bot" : "Medium bot"
+        }🔥`;
+      } else {
+        title = "Try Harder💪";
+        msg = `You lost to the ${
+          gameMode === "BOT_EASY" ? "Easy bot" : "Medium bot"
+        }🙁`;
+      }
+    }
+    Alert.alert(title, msg, [{ text: "New Game", onPress: resetGame }]);
   };
 
   const resetGame = () => {
@@ -192,6 +206,7 @@ export default function App() {
         <Text style={styles.topText}>
           Current Turn: {currentTurn.toUpperCase()}
         </Text>
+
         <View style={styles.map}>
           {gameMap.map((row, rowIndex) => (
             <View style={styles.row} key={`row-${rowIndex}`}>
@@ -204,6 +219,45 @@ export default function App() {
               ))}
             </View>
           ))}
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Text
+            style={[
+              styles.button,
+              {
+                backgroundColor:
+                  gameMode === "LOCAL" ? Colors.btnActiveBg : Colors.btnBg,
+              },
+            ]}
+            onPress={() => setGameMode("LOCAL")}
+          >
+            LOCAL
+          </Text>
+          <Text
+            style={[
+              styles.button,
+              {
+                backgroundColor:
+                  gameMode === "BOT_EASY" ? Colors.btnActiveBg : Colors.btnBg,
+              },
+            ]}
+            onPress={() => setGameMode("BOT_EASY")}
+          >
+            EASY BOT
+          </Text>
+          <Text
+            style={[
+              styles.button,
+              {
+                backgroundColor:
+                  gameMode === "BOT_MEDIUM" ? Colors.btnActiveBg : Colors.btnBg,
+              },
+            ]}
+            onPress={() => setGameMode("BOT_MEDIUM")}
+          >
+            MEDIUM BOT
+          </Text>
         </View>
       </ImageBackground>
       <StatusBar style="auto" />
@@ -242,5 +296,20 @@ const styles = StyleSheet.create({
   row: {
     flex: 1,
     flexDirection: "row",
+  },
+
+  buttonContainer: {
+    position: "absolute",
+    bottom: 50,
+    flexDirection: "row",
+  },
+  button: {
+    color: "white",
+    fontSize: 18,
+    margin: 10,
+    backgroundColor: Colors.btnBg,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
   },
 });
